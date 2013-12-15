@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h1>ALL BLOGS</h1>
+  
+		<a href="{{ logInOutUrl|safe }}">							{{ logInOutUrlText }}
+		</a>
+		<a href="/newBlogPage.html">
+			Create A New Blog
+		</a>
+		</br>
+		</br>
+		</br>
+		{% for blogX in listOfBlogs %}
+			<a href="/{{ blogX.name }}/{{ blogX.key.id }}/viewBlogPostings">					{{ blogX.name }}
+			</a>
+			authored by {{ blogX.user }}
+			<br>
+		{% endfor %}
+	</body>
+</html>
