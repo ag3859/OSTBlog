@@ -5,8 +5,8 @@
   
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
   
-  <form method="post">
-  	<label>Title: </label><br>
+  <form enctype="multipart/form-data" method="post">
+  	<label>Title: </label>
   	<input type="text" name="title">
   	<br>
   	<br>
@@ -15,7 +15,14 @@
 	<textarea rows="20" cols="100" name="body"></textarea>
 	<br>
 	Enter Tags (separated by commas): <input type="text" name="tags"></input>
+	<br>
   	<input type="submit" name="Create New Post"></input>
+  </form>
+  <hr>
+  <form>
+  	<div><label>Image:</label></div>
+     <div><input type="file" name="img"/></div>
+     <input type="submit" value="switch">
   </form>
   
   </body>

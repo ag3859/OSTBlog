@@ -21,8 +21,8 @@ class Post(ndb.Model):
     modifyDate = ndb.DateTimeProperty(auto_now=True)
     cappedText = ndb.StringProperty()
     tags = ndb.StringProperty(repeated=True)
+    #image = db.BlobProperty()
     image = ndb.BlobProperty()
-    
        
 class HomePage(webapp2.RequestHandler):
     def get(self):
@@ -167,7 +167,10 @@ class CreatePost(webapp2.RequestHandler):
         post.title = self.request.get('title')        
         post.body = self.request.get('body')
         post.cappedText = post.body[0:500]
-        post.tags = self.request.get('tags').split(",")
+        tags = self.request.get('tags').split(",")
+        post.tags = [item.strip() for item in tags]
+        image = self.request.get("img")
+        post.image = str(image)
         post.put()
         time.sleep(0.5)
         query = Post.query().filter(Post.title==post.title).filter(Post.user==post.user).order(-Post.createDate).fetch();
