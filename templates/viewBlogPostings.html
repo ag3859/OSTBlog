@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>{{ blogname }}</h1>
+  
+  <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+  <a href="/{{ blogname }}/{{ blogId }}/newPost.html">New Post</a>
+  <hr>
+   {% for post in posts %}
+      <h4>{{ post.title|urlize }}</h4>
+   	<h5> by {{ post.user }}</h5>
+<a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/{{ post.key.id }}/editPost.html'> Edit</a>
+      <pre>{{ post.cappedText|urlize }}...</pre>
+      <a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/{{ post.key.id }}/viewPost.html'> More...</a>
+      <hr>
+    {% endfor %}
+  </div>
+  <div class="pagination">
+    <span class="step-links">
+        <span class="current">
+            Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+        </span>
+
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+  </body>
+</html>

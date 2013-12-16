@@ -22,3 +22,17 @@ indexes:
   - name: blogId
   - name: createDate
     direction: desc
+
+- kind: Post
+  properties:
+  - name: blogId
+  - name: title
+  - name: createDate
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: title
+  - name: user
+  - name: createDate
+    direction: desc

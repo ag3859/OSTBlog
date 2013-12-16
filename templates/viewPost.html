@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>{{ blogname }}</h1>
+  
+  <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+
+  <h2>{{ post.title|urlize }}</h2> by {{ post.user }} <br>
+  <pre>{{ post.body|urlize }} </pre>
+<a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/{{ post.key.id }}/editPost.html'> Edit</a>
+
+  </body>
+</html>

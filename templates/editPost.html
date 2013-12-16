@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>{{ blogname }}</h1>
+  
+  <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+  <div class="container">
+  <form method="post" >
+  	<label>How about the Title: </label><br>
+  	<input type="text" name="title" value ='{{ post.title }}'>
+  	<input type="hidden" name="id" value='{{ post.key.id }}'>
+  	<br>
+  	<br>
+  	<label>Body: </label><br>
+  	<textarea rows="20" cols="100" name="body">{{ post.body }}</textarea>
+  	<br>
+	Enter Tags (separated by comma): <input type="text" name="tags" value='{{ post.tags }}'></input>
+
+  	<input type="submit" name="Update"></input>
+  	
+  </form>
+  </div>
+  </body>
+</html>

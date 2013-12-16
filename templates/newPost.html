@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>CREATE NEW POST</h1>
+  
+  <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+  
+  <form method="post">
+  	<label>Title: </label><br>
+  	<input type="text" name="title">
+  	<br>
+  	<br>
+	<label>Body: </label>
+	<br>
+	<textarea rows="20" cols="100" name="body"></textarea>
+	<br>
+	Enter Tags (separated by commas): <input type="text" name="tags"></input>
+  	<input type="submit" name="Create New Post"></input>
+  </form>
+  
+  </body>
+</html>

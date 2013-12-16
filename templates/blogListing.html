@@ -12,9 +12,15 @@
 		</br>
 		</br>
 		{% for blogX in listOfBlogs %}
-			<a href="/{{ blogX.name }}/{{ blogX.key.id }}/viewBlogPostings">					{{ blogX.name }}
+			<a href="/{{ blogX.name }}/{{ blogX.key.id }}/viewBlogPostings.html">					{{ blogX.name }}
 			</a>
 			authored by {{ blogX.user }}
+			<br>
+		{% endfor %}
+
+		{% for tagX in listOfTags %}
+			<a href="/AllBlogs/AllPosts/{{ tagX }}/viewTagPostings.html">					{{ tagX }}
+			</a>
 			<br>
 		{% endfor %}
 	</body>

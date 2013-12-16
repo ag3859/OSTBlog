@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html>
   <body>
-  <h1>{{ blogname }}</h1>
+  <h1>{{ tag }}</h1>
   
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
-  <a href="{{ blogname }}/{{ blogId }}/new_post">New Post</a>
   <hr>
    {% for post in posts %}
-   
-      <h4>{{ post.title }}</h4><br><a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/edit_post'> Edit</a>
-      <p>{{ post.excerpt }}</p>
-      <a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/view_post'> More...</a>
+      <h4>{{ post.title }}</h4>
+   	<h5> by {{ post.user }}</h5>
+      <pre>{{ post.cappedText|urlize }}...</pre>
+      <a href='/{{ post.blogName }}/{{ post.blogId }}/{{ post.title }}/{{ post.key.id }}/viewPost.html'> More...</a>
       <hr>
     {% endfor %}
   </div>
   <div class="pagination">
     <span class="step-links">
-        {% if posts.has_previous %}
-            <a href="?page={{ posts.previous_page_number }}">previous</a>
-        {% endif %}
-
         <span class="current">
             Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
         </span>
