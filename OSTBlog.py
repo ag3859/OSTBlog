@@ -5,6 +5,7 @@ from google.appengine.api import users
 from google.appengine.ext.webapp import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
+import re
 
 class Blog(ndb.Model):
     name = ndb.StringProperty()
@@ -23,9 +24,15 @@ class Post(ndb.Model):
     tags = ndb.StringProperty(repeated=True)
     #image = db.BlobProperty()
     image = ndb.BlobProperty()
+    
+    def url_for(self):
+        print "aditya print urf for"
+        print self.key.id()
+        return "/image/%d" % self.key.id()
        
 class HomePage(webapp2.RequestHandler):
     def get(self):
+        
         if users.get_current_user():
             logInOutUrl = users.create_logout_url(self.request.uri)
             logInOutUrlText = "Logout"
@@ -83,11 +90,14 @@ class CreateBlog(webapp2.RequestHandler):
         blog.user = users.get_current_user()
         blog.name = self.request.get('name')
         blog.put()
-        time.sleep(0.5)
-        query = Blog.query().filter(Blog.name==blog.name).filter(Blog.user==blog.user).order(-Blog.createDate).fetch();
-        blogId = query[0].key.id()
-        print blogId
-        self.redirect(str('/'+blog.name+'/'+str(blogId)+'/viewBlogPostings.html'));
+        #=======================================================================
+        # time.sleep(0.5)
+        # query = Blog.query().filter(Blog.name==blog.name).filter(Blog.user==blog.user).order(-Blog.createDate).fetch();
+        # blogId = query[0].key.id()
+        # print blogId
+        # self.redirect(str('/'+blog.name+'/'+str(blogId)+'/viewBlogPostings.html'));
+        #=======================================================================
+        self.redirect("/")
 
 class ViewBlog(webapp2.RequestHandler):
     def get(self):
@@ -117,7 +127,8 @@ class ViewBlog(webapp2.RequestHandler):
             logInOutUrlText = 'Login'
             
         templates = {
-            'posts': pageWithPosts,              
+            'posts': pageWithPosts,
+            'user':users.get_current_user(),              
             'logInOutUrl': logInOutUrl,               
             'logInOutUrlText': logInOutUrlText,
             'blogname':blogName,
@@ -172,16 +183,19 @@ class CreatePost(webapp2.RequestHandler):
         image = self.request.get("img")
         post.image = str(image)
         post.put()
-        time.sleep(0.5)
-        query = Post.query().filter(Post.title==post.title).filter(Post.user==post.user).order(-Post.createDate).fetch();
-        postId = query[0].key.id()
-        print postId
-        self.redirect(str('/' + blogName + '/' + str(blogId) + '/'+post.title+'/'+str(postId)+'/viewPost.html'));
-
+        #=======================================================================
+        # time.sleep(0.5)
+        # query = Post.query().filter(Post.title==post.title).filter(Post.user==post.user).order(-Post.createDate).fetch();
+        # postId = query[0].key.id()
+        # print postId
+        # self.redirect(str('/' + blogName + '/' + str(blogId) + '/'+post.title+'/'+str(postId)+'/viewPost.html'));
+        #=======================================================================
+        self.redirect(str('/' + blogName + '/' + str(blogId) + '/viewBlogPostings.html'));
 
 
 class ViewPost(webapp2.RequestHandler):
     def get(self):
+        print "test"
         url=os.environ['PATH_INFO']
         blogName=url.split('/')[1]        
         blogId=url.split('/')[2]
@@ -196,8 +210,11 @@ class ViewPost(webapp2.RequestHandler):
             logInOutUrl = users.create_login_url(self.request.uri)
             logInOutUrlText = 'Login'
             
+        post.body = re.sub('(http(s)?://[^\s]*((\.jpg)|(\.gif)|(\.png)))','<img src=\'\g<1>\' alt="cat" >',post.body)
+            
         templates = {
-            'post': post,              
+            'post': post,
+            'user':users.get_current_user(),
             'logInOutUrl': logInOutUrl,               
             'logInOutUrlText': logInOutUrlText,
             'userId':users.get_current_user(),
@@ -260,10 +277,13 @@ class EditPost(webapp2.RequestHandler):
         post.tags = [item.strip() for item in tags]
 #        post.modifyDate = 
         post.put()
-        time.sleep(0.5)
-        query = Post.query().filter(Post.title == post.title).filter(Post.blogId == int(blogId)).order(-Post.createDate).fetch();
-        print str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html')
-        self.redirect(str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html'))
+        #=======================================================================
+        # time.sleep(0.5)
+        # query = Post.query().filter(Post.title == post.title).filter(Post.blogId == int(blogId)).order(-Post.createDate).fetch();
+        # print str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html')
+        # self.redirect(str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html'))
+        #=======================================================================
+        self.redirect(str('/' + blogName + '/' + str(blogId) + '/viewBlogPostings.html'))
 
 
 class ViewTagPostings(webapp2.RequestHandler):
@@ -308,12 +328,31 @@ class ViewTagPostings(webapp2.RequestHandler):
         templates))
 
 
+class ImageHandler(webapp2.RequestHandler):
+    def get(self, image_id):
+        requestedImage = Post.get_by_id(image_id)
+        print image_id
+        print "image_id"
+        if requestedImage is not None:
+            print "aditya"
+            print requestedImage
+            print "garg"
+            #print requestedImage.image            
+            self.response.write(requestedImage.image)
+        else:
+            self.response.write('Not Found')
+
+            # return a default image when we can't located the
+            # one that was requested?
+
+
 app = webapp2.WSGIApplication([
        ('/', HomePage),
+       (r'/image/(\d+)$', ImageHandler),
        ('/newBlogPage.html', CreateBlog),  
        (r'.*/viewBlogPostings.html$', ViewBlog),
        (r'.*/newPost.html$', CreatePost),
        (r'.*/viewPost.html$', ViewPost),
        (r'.*/editPost.html$', EditPost),
-       (r'.*/viewTagPostings.html$', ViewTagPostings),
+       (r'.*/viewTagPostings.html$', ViewTagPostings),       
 ], debug=True)

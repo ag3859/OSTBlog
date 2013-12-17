@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% autoescape off %}
 <html>
   <body>
   <h1>{{ blogname }}</h1>
@@ -9,7 +10,10 @@
    {% for post in posts %}
       <h4>{{ post.title|urlize }}</h4>
    	<h5> by {{ post.user }}</h5>
+{% if user = post.user %}
 <a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/{{ post.key.id }}/editPost.html'> Edit</a>
+{% endif %}
+
       <pre>{{ post.cappedText|urlize }}...</pre>
       <a href='/{{ blogname }}/{{ blogId }}/{{ post.title }}/{{ post.key.id }}/viewPost.html'> More...</a>
       <hr>
@@ -28,3 +32,4 @@
 </div>
   </body>
 </html>
+{% endautoescape %}
