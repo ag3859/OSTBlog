@@ -1,10 +1,9 @@
 import os
 import webapp2
-from google.appengine.ext import ndb, db
+from google.appengine.ext import ndb
 from google.appengine.api import users 
 from google.appengine.ext.webapp import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import time
 import re
 
 class Blog(ndb.Model):
