@@ -6,11 +6,17 @@ from google.appengine.ext.webapp import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import re
 
+#===============================================================================
+# Class definition for each Blog
+#===============================================================================
 class Blog(ndb.Model):
     name = ndb.StringProperty()
     user = ndb.UserProperty()
     createDate = ndb.DateTimeProperty(auto_now_add=True)
 
+#===============================================================================
+# Class definition for each Post
+#===============================================================================
 class Post(ndb.Model):
     title = ndb.StringProperty()
     blogId = ndb.IntegerProperty()
@@ -24,11 +30,19 @@ class Post(ndb.Model):
     #image = db.BlobProperty()
     image = ndb.BlobProperty()
     
+    #===========================================================================
+    # Provides a link for the BlobProperty image file
+    #===========================================================================
+        
     def url_for(self):
         print "aditya print urf for"
         print self.key.id()
         return "/image/%d" % self.key.id()
-       
+
+
+#===============================================================================
+# Renders main home page with all blog listings and list of unique tags to search posts        
+#===============================================================================
 class HomePage(webapp2.RequestHandler):
     def get(self):
         
@@ -39,16 +53,19 @@ class HomePage(webapp2.RequestHandler):
             logInOutUrl = users.create_login_url(self.request.uri)
             logInOutUrlText = "Login"
             
+        #=======================================================================
+        # Get all blogs
+        #=======================================================================
         query = Blog.query()
         listOfBlogs = query.fetch()
         
+        #=======================================================================
+        # Get unique list of tags
+        #=======================================================================
         query = Post.query()
         tags = []
         for blog in query:
-            tags.extend(blog.tags)
-                
-        #tagsStripped = [str(item).strip() for item in tags]
-        #listOfTags = list(set(tagsStripped))
+            tags.extend(blog.tags)                
         listOfTags = list(set(tags))
                 
         templates = {
@@ -63,14 +80,16 @@ class HomePage(webapp2.RequestHandler):
             'templates/blogListing.html'),
         templates))
         
-        
+#===============================================================================
+# Allows user to create a new Blog, only if they are logged in        
+#===============================================================================
 class CreateBlog(webapp2.RequestHandler):
     def get(self):
         if users.get_current_user():
             logInOutUrl = users.create_logout_url(self.request.uri)
             logInOutUrlText = "Logout"
         else:
-            self.redirect(users.create_login_url())
+            self.redirect(users.create_login_url())                         #Redirect if not logged in
             logInOutUrl = users.create_login_url(self.request.uri)
             logInOutUrlText = "Login"
         
@@ -89,23 +108,24 @@ class CreateBlog(webapp2.RequestHandler):
         blog.user = users.get_current_user()
         blog.name = self.request.get('name')
         blog.put()
-        #=======================================================================
-        # time.sleep(0.5)
-        # query = Blog.query().filter(Blog.name==blog.name).filter(Blog.user==blog.user).order(-Blog.createDate).fetch();
-        # blogId = query[0].key.id()
-        # print blogId
-        # self.redirect(str('/'+blog.name+'/'+str(blogId)+'/viewBlogPostings.html'));
-        #=======================================================================
         self.redirect("/")
 
+#===============================================================================
+# View all posts of a blog, 10 items at a time 
+#===============================================================================
 class ViewBlog(webapp2.RequestHandler):
     def get(self):
         url=os.environ['PATH_INFO']
-        blogName=url.split('/')[1]
-        
+        blogName=url.split('/')[1]        
         blogId=url.split('/')[2]
+        #=======================================================================
+        # Fetch all posts associated with the relevant blog
+        #=======================================================================
         query = Post.query().filter(Post.blogId==int(blogId)).order(-Post.createDate)
         posts = query.fetch()
+        #=======================================================================
+        # Paginator takes care of the 10 at a time requirement
+        #=======================================================================
         paginator=Paginator(posts, 10)
         newPage = self.request.get('page')
         try:
@@ -140,8 +160,9 @@ class ViewBlog(webapp2.RequestHandler):
           'templates/viewBlogPostings.html'),
         templates))
 
-
-
+#===============================================================================
+# Allows user to create a new post under the current blog, only if they are logged in, 
+#===============================================================================
 class CreatePost(webapp2.RequestHandler):
     def get(self):
         url=os.environ['PATH_INFO']
@@ -152,7 +173,10 @@ class CreatePost(webapp2.RequestHandler):
             logInOutUrl = users.create_logout_url(self.request.uri)
             logInOutUrlText = "Logout"
         else:
-            self.redirect(users.create_login_url())
+            #===================================================================
+            # Redirect if not logged in
+            #===================================================================
+            self.redirect(users.create_login_url(self.request.uri))
             logInOutUrl = users.create_login_url(self.request.uri)
             logInOutUrlText = "Login"
         
@@ -176,22 +200,18 @@ class CreatePost(webapp2.RequestHandler):
         post.user = users.get_current_user()
         post.title = self.request.get('title')        
         post.body = self.request.get('body')
-        post.cappedText = post.body[0:500]
+        post.cappedText = post.body[0:500]                      #capped text
         tags = self.request.get('tags').split(",")
-        post.tags = [item.strip() for item in tags]
+        post.tags = [item.strip() for item in tags]             #strip spaces from tags
         image = self.request.get("img")
         post.image = str(image)
         post.put()
-        #=======================================================================
-        # time.sleep(0.5)
-        # query = Post.query().filter(Post.title==post.title).filter(Post.user==post.user).order(-Post.createDate).fetch();
-        # postId = query[0].key.id()
-        # print postId
-        # self.redirect(str('/' + blogName + '/' + str(blogId) + '/'+post.title+'/'+str(postId)+'/viewPost.html'));
-        #=======================================================================
         self.redirect(str('/' + blogName + '/' + str(blogId) + '/viewBlogPostings.html'));
 
 
+#===============================================================================
+# Shows the full view of the post. Full body, clickable links and inline images
+#===============================================================================
 class ViewPost(webapp2.RequestHandler):
     def get(self):
         print "test"
@@ -208,7 +228,10 @@ class ViewPost(webapp2.RequestHandler):
         else:            
             logInOutUrl = users.create_login_url(self.request.uri)
             logInOutUrlText = 'Login'
-            
+        
+        #=======================================================================
+        # Wrap image link with image tag to display inline    
+        #=======================================================================
         post.body = re.sub('(http(s)?://[^\s]*((\.jpg)|(\.gif)|(\.png)))','<img src=\'\g<1>\' alt="cat" >',post.body)
             
         templates = {
@@ -226,7 +249,9 @@ class ViewPost(webapp2.RequestHandler):
           'templates/viewPost.html'),
         templates))
 
-
+#===============================================================================
+# Provide exisiting values in a form for user to edit the post
+#===============================================================================
 class EditPost(webapp2.RequestHandler):
     def get(self):
         if users.get_current_user():
@@ -246,9 +271,17 @@ class EditPost(webapp2.RequestHandler):
         post = Post.query().filter(Post.title==postTitle).filter(Post.blogId == int(blogId)).fetch()
                 
         print(post)
+        
+        post[0].tags = [str(item) for item in post[0].tags]
+        
+        tags = ""
+        
+        for item in post[0].tags:
+            tags = tags + str(item) + ","
             
         templates = {
-            'post': post[0],              
+            'post': post[0],            
+            'tags': tags,  
             'logInOutUrl': logInOutUrl,               
             'logInOutUrlText': logInOutUrlText,
             'userId':users.get_current_user(),
@@ -274,26 +307,20 @@ class EditPost(webapp2.RequestHandler):
         post.cappedText = post.body[0:500]
         tags = self.request.get('tags').split(",")
         post.tags = [item.strip() for item in tags]
-#        post.modifyDate = 
         post.put()
-        #=======================================================================
-        # time.sleep(0.5)
-        # query = Post.query().filter(Post.title == post.title).filter(Post.blogId == int(blogId)).order(-Post.createDate).fetch();
-        # print str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html')
-        # self.redirect(str('/' + blogName + '/' + str(blogId) + '/' + post.title + '/' + str(postId) + '/viewPost.html'))
-        #=======================================================================
         self.redirect(str('/' + blogName + '/' + str(blogId) + '/viewBlogPostings.html'))
 
-
+#===============================================================================
+# Shows list of Posts, 10 at a time, selected depending on the tag present in the posts
+#===============================================================================
 class ViewTagPostings(webapp2.RequestHandler):
     def get(self):
         url=os.environ['PATH_INFO']
         tag=url.split('/')[3]
-                
+        
         query = Post.query().fetch()
-        
         relevantQueries = [item for item in query if (tag in item.tags)]
-        
+
         paginator=Paginator(relevantQueries, 10)
         newPage = self.request.get('page')
         try:
@@ -326,17 +353,14 @@ class ViewTagPostings(webapp2.RequestHandler):
           'templates/viewTagPostings.html'),
         templates))
 
-
+#===============================================================================
+# Extracts image out of the relevant post
+#===============================================================================
 class ImageHandler(webapp2.RequestHandler):
     def get(self, image_id):
         requestedImage = Post.get_by_id(image_id)
-        print image_id
-        print "image_id"
+
         if requestedImage is not None:
-            print "aditya"
-            print requestedImage
-            print "garg"
-            #print requestedImage.image            
             self.response.write(requestedImage.image)
         else:
             self.response.write('Not Found')
@@ -344,7 +368,9 @@ class ImageHandler(webapp2.RequestHandler):
             # return a default image when we can't located the
             # one that was requested?
 
-
+#===============================================================================
+# Generates RSS Feed. Fetches all posts for a blog and sends to RSSFeed.xml 
+#===============================================================================
 class RSSFeed(webapp2.RequestHandler):
     def get(self):
         url=os.environ['PATH_INFO']
@@ -363,7 +389,9 @@ class RSSFeed(webapp2.RequestHandler):
           'templates/RSSFeed.xml'),
         template_values))
 
-
+#===============================================================================
+# Matches link using Regex and fires appropriate handlers
+#===============================================================================
 app = webapp2.WSGIApplication([
        ('/', HomePage),
        (r'/image/(\d+)$', ImageHandler),
