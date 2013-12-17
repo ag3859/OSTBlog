@@ -3,10 +3,13 @@
 <html>
   <body>
   <h1>{{ blogname }}</h1>
-  
+  <hr>  
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href = "/"> HOME </a>
 
-  <h2>{{ post.title|urlize }}</h2> by {{ post.user }} <br>
+  <h2>{{ post.title|urlize }}</h2> <h4> &nbsp;&nbsp;&nbsp; by {{ post.user }} </h4>
+
   Created on : {{ post.createDate }} <br>
   Last Modified on : {{ post.modifyDate }} <br>
   <img src='{{post.url_for}}' />

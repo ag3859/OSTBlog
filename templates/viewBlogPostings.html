@@ -5,8 +5,13 @@
   <h1>{{ blogname }}</h1>
   
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="/{{ blogname }}/{{ blogId }}/newPost.html">New Post</a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="/{{ blogname }}/{{ blogId }}/RSSFeed.xml"> RSS Feed </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href = "/"> HOME </a>
+
   <hr>
    {% for post in posts %}
       <h4>{{ post.title|urlize }}</h4>

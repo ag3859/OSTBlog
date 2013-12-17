@@ -66,7 +66,7 @@ class HomePage(webapp2.RequestHandler):
         tags = []
         for blog in query:
             tags.extend(blog.tags)                
-        listOfTags = list(set(tags))
+        listOfTags = list(set(tags))[1:]
                 
         templates = {
                     'listOfBlogs':listOfBlogs,
@@ -358,8 +358,13 @@ class ViewTagPostings(webapp2.RequestHandler):
 #===============================================================================
 class ImageHandler(webapp2.RequestHandler):
     def get(self, image_id):
-        requestedImage = Post.get_by_id(image_id)
-
+        requestedImage = Post.get_by_id(int(image_id))
+        print "image_id"
+        print image_id
+        print "requestedImage"
+        print requestedImage.title
+        print "requestedImage.image"
+        #print requestedImage.image
         if requestedImage is not None:
             self.response.write(requestedImage.image)
         else:

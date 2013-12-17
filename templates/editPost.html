@@ -4,7 +4,8 @@
   <h1>{{ blogname }}</h1>
   
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
-  <div class="container">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href = "/"> HOME </a>
   <form method="post" >
   	<label>How about the Title: </label><br>
   	<input type="text" name="title" value ='{{ post.title }}'>
@@ -19,6 +20,5 @@
   	<input type="submit" name="Update"></input>
   	
   </form>
-  </div>
   </body>
 </html>
