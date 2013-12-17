@@ -346,6 +346,25 @@ class ImageHandler(webapp2.RequestHandler):
             # one that was requested?
 
 
+class RSSFeed(webapp2.RequestHandler):
+    def get(self):
+        url=os.environ['PATH_INFO']
+        blogName=url.split('/')[1]
+        blogId=url.split('/')[2]
+        blog=Blog.get_by_id(int(blogId))
+        posts = Post.query().filter(Post.blogId==int(blogId)).order(-Post.modifyDate).fetch()
+        #posts = posts_query.fetch()        
+        template_values = {
+            'blogName':blogName,
+            'posts': posts,               
+        }
+        self.response.headers['Content-Type']='text/xml'
+        self.response.write(template.render(
+        os.path.join(os.path.dirname(__file__),
+          'templates/RSSFeed.xml'),
+        template_values))
+
+
 app = webapp2.WSGIApplication([
        ('/', HomePage),
        (r'/image/(\d+)$', ImageHandler),
@@ -354,5 +373,6 @@ app = webapp2.WSGIApplication([
        (r'.*/newPost.html$', CreatePost),
        (r'.*/viewPost.html$', ViewPost),
        (r'.*/editPost.html$', EditPost),
-       (r'.*/viewTagPostings.html$', ViewTagPostings),       
+       (r'.*/viewTagPostings.html$', ViewTagPostings),
+       (r'.*/RSSFeed.xml$',RSSFeed)        
 ], debug=True)

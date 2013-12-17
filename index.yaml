@@ -26,6 +26,12 @@ indexes:
 - kind: Post
   properties:
   - name: blogId
+  - name: modifyDate
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: blogId
   - name: title
   - name: createDate
     direction: desc

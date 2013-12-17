@@ -6,6 +6,7 @@
   
   <a href="{{ logInOutUrl|safe }}">{{ logInOutUrlText }}</a>
   <a href="/{{ blogname }}/{{ blogId }}/newPost.html">New Post</a>
+  <a href="/{{ blogname }}/{{ blogId }}/RSSFeed.xml"> RSS Feed </a>
   <hr>
    {% for post in posts %}
       <h4>{{ post.title|urlize }}</h4>
